@@ -1,2 +1,12 @@
 /.venv
-
+`
+game/classes/__pycache__/stateClass.cpython-312.pyc
+game/classes/__pycache__/__init__.cpython-312.pyc
+game/classes/__pycache__/buttonClass.cpython-312.pyc
+game/classes/__pycache__/entityClass.cpython-312.pyc
+game/classes/__pycache__/gameClass.cpython-312.pyc
+assets/misc/.DS_Store
+assets/main menu/.DS_Store
+assets/characters/.DS_Store
+assets/.DS_Store
+.DS_Store
