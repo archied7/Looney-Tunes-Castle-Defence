@@ -10,3 +10,6 @@ assets/main menu/.DS_Store
 assets/characters/.DS_Store
 assets/.DS_Store
 .DS_Store
+game/classes/states/__pycache__/mainGameState.cpython-312.pyc
+game/classes/states/__pycache__/mainMenuState.cpython-312.pyc
+game/classes/states/__pycache__/stateClass.cpython-312.pyc
