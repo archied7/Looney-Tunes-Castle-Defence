@@ -1,0 +1,26 @@
+{"frames":{
+    "stand":
+    {
+        "frame" : {"x":0, "y":0, "width":21, "height":44}
+    },
+    "ability1":
+    {
+        "frame" : {"x":21, "y":0, "width":26, "height":44}
+    },
+    "ability2":
+    {
+        "frame" : {"x":47, "y":0, "width":25, "height":44}
+    },
+    "run1":
+    {
+        "frame" : {"x":72, "y":2, "width":31, "height":42}
+    },
+    "run2":
+    {
+        "frame" : {"x":103, "y":1, "width":19, "height":43}
+    },
+    "run3":
+    {
+        "frame" : {"x":122, "y":2, "width":31, "height":42}
+    }
+}}

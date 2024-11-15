@@ -12,7 +12,6 @@ class Main():
         self.HEIGHT = 900
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.RESIZABLE)
 
-
         pygame.display.set_caption('Looney Tunes Castle Defence')
         icon = pygame.image.load(os.path.dirname(os.path.dirname(__file__)) + "/assets/misc/icon.png")
         pygame.display.set_icon(icon)
@@ -34,8 +33,8 @@ class Main():
     #game loop
     def gameLoop(self) -> None:
         self.loadStates()
-        self.clock.tick(self.FPS)
         while self.running:
+            self.clock.tick(self.FPS)
             self.get_dt()
             self.getEvents()
             self.update()
@@ -47,10 +46,11 @@ class Main():
             if event.type == pygame.QUIT:
                 self.running = False
             
+    #calls update function from the current state
     def update(self) -> None:
         self.stateStack[-1].update(self.dt)
 
-    #renders game screen
+    #calls the render function from the current state
     def render(self) -> None:
         self.stateStack[-1].render(self.screen)
         
@@ -60,7 +60,6 @@ class Main():
         timeNow = time.time()
         self.dt = timeNow - self.previousTime
         self.previousTime = timeNow
-
 
 if __name__ == "__main__":
     game = Main()
