@@ -1,0 +1,14 @@
+{"frames":{
+    "run1":
+    {
+        "frame" : {"x":0, "y":5, "width":11, "height":43}
+    },
+    "run2":
+    {
+        "frame" : {"x":12, "y":2, "width":11, "height":46}
+    },
+    "run3":
+    {
+        "frame" : {"x":24, "y":0, "width":11, "height":48}
+    }
+}}

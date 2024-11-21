@@ -3,7 +3,7 @@ import json
 
 class SpriteLoader():
     def __init__(self, metaDir, spriteSheet) -> None:
-        self.scale = 2.5
+        self.scale = 5
         self.sprites = {}
         f = open(metaDir)
         self.data = json.load(f)
@@ -12,7 +12,6 @@ class SpriteLoader():
             i = i[1]['frame']
             currentSprite = self.loadSprites(spriteSheet, i['x'], i['y'], i['width'], i['height'])
             self.sprites[currentSpriteName] = currentSprite
-        self.sheet = spriteSheet
 
 
     def loadSprites(self, spriteSheet, x, y, width, height) -> pygame.Surface:
@@ -23,6 +22,5 @@ class SpriteLoader():
     
     def getSprites(self):
         return self.sprites
-    
 
     

@@ -6,11 +6,11 @@ import os
 class MainMenu(State):
     def __init__(self, main):
         State.__init__(self, main)
-        self.mainMenuButton = Button(600,750, self.buttonImage, 0.8, self.buttonPressedImage)
+        self.mainMenuButton = Button(600,750, self.buttonImage, 0.8, self.buttonPressedImage, 1)
         self.pressed = False
     
     #updates the screen and checks for button press
-    def update(self, dt) -> None:
+    def update(self, dt, inputs) -> None:
         pygame.display.update()
         if self.pressed:
             nextState = MainGame(self.main)
@@ -18,10 +18,10 @@ class MainMenu(State):
 
 
     #draws the main menu and button onto the screen
-    def render(self, screen) -> None:
+    def render(self, screen, inputs) -> None:
         screen.fill((0,0,0))
         screen.blit(self.mainMenuImage, (0,0))
-        if self.mainMenuButton.draw(screen) == 1:
+        if self.mainMenuButton.draw(screen, inputs) == 1:
             self.pressed = True
 
         

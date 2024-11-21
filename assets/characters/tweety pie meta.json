@@ -1,0 +1,10 @@
+{"frames":{
+    "fly1":
+    {
+        "frame" : {"x":0, "y":0, "width":11, "height":16}
+    },
+    "fly2":
+    {
+        "frame" : {"x":12, "y":0, "width":11, "height":16}
+    }
+}}

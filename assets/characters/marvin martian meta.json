@@ -1,0 +1,18 @@
+{"frames":{
+    "walk1":
+    {
+        "frame" : {"x":18, "y":0, "width":30, "height":37}
+    },
+    "walk2":
+    {
+        "frame" : {"x":49, "y":1, "width":30, "height":36}
+    },
+    "bullet1":
+    {
+        "frame" : {"x":0, "y":16, "width":8, "height":8}
+    },
+    "bullet2":
+    {
+        "frame" : {"x":9, "y":16, "width":8, "height":8}
+    }
+}}

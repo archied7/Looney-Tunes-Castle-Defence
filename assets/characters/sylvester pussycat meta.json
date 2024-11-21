@@ -1,0 +1,26 @@
+{"frames":{
+    "attack":
+    {
+        "frame" : {"x":0, "y":0, "width":31, "height":37}
+    },
+    "run1":
+    {
+        "frame" : {"x":32, "y":7, "width":36, "height":30}
+    },
+    "run2":
+    {
+        "frame" : {"x":69, "y":5, "width":35, "height":32}
+    },
+    "run3":
+    {
+        "frame" : {"x":106, "y":10, "width":38, "height":27}
+    },
+    "run4":
+    {
+        "frame" : {"x":145, "y":12, "width":38, "height":25}
+    },
+    "run5":
+    {
+        "frame" : {"x":184, "y":8, "width":38, "height":29}
+    }
+}}

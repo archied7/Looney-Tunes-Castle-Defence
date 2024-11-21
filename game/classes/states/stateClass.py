@@ -1,3 +1,5 @@
+import pygame
+
 class State():
     def __init__(self, main) -> None:
         self.main = main
@@ -5,11 +7,11 @@ class State():
         self.loadImages()
 
     #abstract update function
-    def update(self) -> None:
+    def update(self, dt, inputs) -> None:
         pass
 
     #abstract render function
-    def render(self) -> None:
+    def render(self, screen, inputs) -> None:
         pass
 
     #abstract function to load images for the state
