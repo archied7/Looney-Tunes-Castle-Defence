@@ -1,6 +1,7 @@
 from classes.states.stateClass import State
 from classes.buttonClass import Button
 import pygame
+import time
 import os
 
 class Pause(State):
@@ -8,12 +9,14 @@ class Pause(State):
         State.__init__(self, main)
         self.exitButton = Button(539, 450, self.main.exitImage, 2.5, self.main.exitHoverImage)
         self.pauseButton = Button(539, 300, self.pauseImage, 2.5, self.pauseHoverImage)
+        self.main.game.changePause()
+        self.startTicks = pygame.time.get_ticks()
 
     def update(self, dt, inputs) -> None:
         pygame.display.update()
 
     def render(self, screen, inputs) -> None:
-        if self.pauseButton.draw(screen, inputs) == 1 :
+        if self.pauseButton.draw(screen, inputs) == 1:
             self.leaveState()
 
         if self.exitButton.draw(screen, inputs) == 1:

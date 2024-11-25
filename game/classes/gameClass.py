@@ -11,7 +11,9 @@ class Game:
         self.currentTower = None
         self.ownedHeroes = []
         self.currentHeroes = {}
-        self.state = None
+        self.gold = 100
+        self.paused = False
+        self.pauseTick = 0
 
     #adds an enemy object to the enemies list
     def spawnEnemy(self, enemy: object) -> None:
@@ -68,5 +70,23 @@ class Game:
         else:
             print("Tower not owned")
 
+    def changeGold(self, value: int, remove: bool) -> int:
+        if remove: 
+            self.gold -= value
+        else:
+            self.gold += value
 
+        return int(self.gold * 0.10)
+
+    def getGold(self) -> int:
+        return self.gold
+
+    def changePause(self) -> None:
+        if self.paused:
+            self.paused = False
+        else:
+            self.paused = True
+
+    def getPause(self) -> None:
+        return self.paused
 

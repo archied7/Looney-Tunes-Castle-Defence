@@ -20,6 +20,8 @@ class MainGame(State):
         screen.fill((0,0,0))
         screen.blit(self.backgroundImage, (0,0))
         
+        self.main.drawText('GOLD: ' + str(self.main.game.getGold()), 10, 10, screen, 30)
+
         if inputs['escape'] == True:
             nextState = Pause(self.main)
             nextState.newState()

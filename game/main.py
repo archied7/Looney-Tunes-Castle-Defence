@@ -2,11 +2,13 @@ import pygame
 import time
 import os
 from classes.states import mainMenuState
+from classes.gameClass import Game
 
 class Main():
     #initialise Main class
     def __init__(self) -> None:
         pygame.init()
+        self.game = Game()
         #set game window
         self.WIDTH = 1440
         self.HEIGHT = 900
@@ -29,6 +31,7 @@ class Main():
         self.previousTime = 0
         self.FPS = 30
         self.stateStack = []
+        self.minigameValue = int(self.game.getGold() * 0.1)
 
     #initialises states
     def loadStates(self) -> None:
@@ -88,6 +91,10 @@ class Main():
         timeNow = time.time()
         self.dt = timeNow - self.previousTime
         self.previousTime = timeNow
+
+    def drawText(self, text, x, y, screen, size) -> None:
+        image = pygame.font.Font(os.getcwd() + '/assets/misc/font.ttf', size).render(text, True, (255, 215, 0))
+        screen.blit(image, (x,y))
 
 if __name__ == "__main__":
     game = Main()

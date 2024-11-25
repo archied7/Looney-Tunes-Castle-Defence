@@ -13,8 +13,8 @@ class MinigameSelect(State):
         self.status = 1 if minigame is loaded
         """
         State.__init__(self, main)
-        self.tweetyMinigameButton = Button(400, 400, self.tweetyMinigameIconImage, 10)
-        self.roadRunnerMinigameButton = Button(800,400, self.roadRunnerMinigameIconImage, 2.5)
+        self.tweetyMinigameButton = Button(400, 300, self.tweetyMinigameIconImage, 10)
+        self.roadRunnerMinigameButton = Button(800,300, self.roadRunnerMinigameIconImage, 2.5)
         self.status = 0
 
     def update(self, dt, inputs):
@@ -26,6 +26,9 @@ class MinigameSelect(State):
         if inputs['escape'] == True:
             nextState = Pause(self.main)
             nextState.newState()
+
+        screen.blit(self.backgroundImage, (355, 254))
+        self.main.drawText('Reward: ' + str(self.main.minigameValue) + 'G', 614, 650, screen, 30)
             
         if self.tweetyMinigameButton.draw(screen, inputs) == 1:
             self.status = 1
@@ -43,3 +46,4 @@ class MinigameSelect(State):
     def loadImages(self):
         self.tweetyMinigameIconImage = pygame.image.load(os.getcwd() + '/assets/misc/tweety game icon.png')
         self.roadRunnerMinigameIconImage = pygame.image.load(os.getcwd() + '/assets/misc/road runner game icon.png')
+        self.backgroundImage = pygame.image.load(os.getcwd() + '/assets/misc/minigame background.png')
