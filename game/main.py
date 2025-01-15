@@ -167,8 +167,8 @@ class Main():
     
 
     @property
-    def running(self) -> None:
-        raise AttributeError('write only')
+    def running(self) -> bool:
+        return self._running
     @running.setter
     def running(self, val: bool) -> None:
         self._running = val
