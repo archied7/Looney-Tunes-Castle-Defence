@@ -13,10 +13,10 @@ class TweetyPie(State):
 
         #set game variables
         self.passPipe = False
-        self.scrollSpeed = 7
+        self.scrollSpeed = 14
         self.alive = True
         self.groundScroll = 0
-        self.pipeFreq = 2000
+        self.pipeFreq = 1000
         self.lastPipe = pygame.time.get_ticks() - self.pipeFreq
         self.score = 0
         self.counter = 0
@@ -24,13 +24,21 @@ class TweetyPie(State):
         self.goldAdded = False
         self.currentTickDifference = 0
 
+        if self.main.game.round <= 20:
+            if self.main.game.round == 1:
+                self.pipeTotal = 1
+            else:
+                self.pipeTotal = self.main.game.round - 1
+        else:
+            self.pipeTotal = 20
+
         self.tweety = Tweety(200, ((self.main.HEIGHT / 2) - 100 ))
         self.pipeGroup = pygame.sprite.Group()
 
     def update(self, dt, inputs) -> None:
         pygame.display.update()
 
-        if self.score >= 5:
+        if self.score >= self.pipeTotal:
             self.alive = False
             self.result = True
 
@@ -56,11 +64,12 @@ class TweetyPie(State):
 
                 #checks for collisions
                 if pygame.sprite.spritecollideany(self.tweety, self.pipeGroup):
+                    self.tweety.flying = False
                     self.alive = False
 
                 #generates pipes
-                if timeNow - self.lastPipe > self.pipeFreq and self.counter < 5:
-                    height = random.randint(-100,100)
+                if timeNow - self.lastPipe > self.pipeFreq and self.counter < self.pipeTotal:
+                    height = random.randint(-175,150)
 
                     bottomPipe = Pipe(self.main.WIDTH, self.main.HEIGHT/2 + height, 0, self.pipeImage)
                     topPipe = Pipe(self.main.WIDTH, self.main.HEIGHT/2 + height, 1, self.pipeImage)
@@ -79,6 +88,7 @@ class TweetyPie(State):
                 self.lastPipe = pygame.time.get_ticks() - self.currentTickDifference
                 self.main.game.changePause()
 
+        #handles if the game was successful, as well as adding rewards
         else:
             if self.result:
                 if self.goldAdded == False:
@@ -94,8 +104,12 @@ class TweetyPie(State):
         self.pipeGroup.draw(screen)
         
         screen.blit(self.groundImage, (self.groundScroll,800))
-        self.main.drawText(str(self.score), 10, 10, screen, 60)
+        self.main.drawText(str(self.score), 10, 10, 60)
 
+        if self.tweety.getFlying() == False and self.alive:
+            screen.blit(self.tutorialImage, (self.main.WIDTH/2 - self.tutorialImage.get_width()/2, self.main.HEIGHT/2 - self.tutorialImage.get_height()/2))
+
+        #handles pausing
         if inputs['escape'] == True:
             nextState = Pause(self.main)
             self.currentTickDifference = pygame.time.get_ticks() - self.lastPipe
@@ -107,9 +121,12 @@ class TweetyPie(State):
                 self.leaveState()
 
     def loadImages(self) -> None:
+        #loads images needed for game
         self.backgroundImage = pygame.image.load(os.getcwd() + '/assets/tweety pie minigame/tweety pie background.png')
         self.groundImage = pygame.image.load(os.getcwd() + '/assets/tweety pie minigame/ground.png')
         self.pipeImage = pygame.image.load(os.getcwd() + '/assets/tweety pie minigame/pipe.png')
+        self.tutorialImage = pygame.image.load(os.getcwd() + '/assets/tweety pie minigame/tweety tutorial.png')
+        self.tutorialImage = pygame.transform.scale_by(self.tutorialImage, 2.5)
 
 class Tweety():
     def __init__(self, x, y):
@@ -138,6 +155,10 @@ class Tweety():
             self.flying = False
             return 1
 
+        if self.rect.y < -250:
+            self.flying = False
+            return 1
+
         if inputs['click'] == True:
             if self.flying == False:
                 self.flying = True
@@ -157,12 +178,8 @@ class Tweety():
 
     def loadSprites(self):
         tweetyPieSpriteSheet = pygame.image.load(os.getcwd() + '/assets/characters/tweety pie.png')
-        tweetyPieSpritesObject = SpriteLoader((os.getcwd() + '/assets/characters/tweety pie meta.json'), tweetyPieSpriteSheet)
-        self.tweetySprites = tweetyPieSpritesObject.getSprites()
-
-        self.tweetyFrames = []
-        for i in self.tweetySprites:
-            self.tweetyFrames.append(self.tweetySprites[i])
+        tweetyPieSpritesObject = SpriteLoader((os.getcwd() + '/assets/characters/tweety pie meta.json'), tweetyPieSpriteSheet, True)
+        self.tweetyFrames = tweetyPieSpritesObject.getSpritesList()
 
     def getFlying(self):
         return self.flying

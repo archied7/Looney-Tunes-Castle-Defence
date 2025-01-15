@@ -16,7 +16,17 @@ class MinigameSelect(State):
         self.tweetyMinigameButton = Button(400, 300, self.tweetyMinigameIconImage, 10)
         self.roadRunnerMinigameButton = Button(800,300, self.roadRunnerMinigameIconImage, 2.5)
         self.status = 0
+        self.lived = self.main.survivedRound
+        self.main.survivedRound = True
 
+        self.surface = pygame.Surface((1440,900), pygame.SRCALPHA)
+        if self.lived:
+            self.surface.fill((0,0,0,100))
+        else:
+            self.surface.fill((120,6,6,200))
+
+        self.grayed = False
+        
     def update(self, dt, inputs):
         pygame.display.update()
         if self.status == 1:
@@ -27,8 +37,12 @@ class MinigameSelect(State):
             nextState = Pause(self.main)
             nextState.newState()
 
+        if self.grayed is not True:
+            screen.blit(self.surface, (0,0))
+            self.grayed = True
+
         screen.blit(self.backgroundImage, (355, 254))
-        self.main.drawText('Reward: ' + str(self.main.minigameValue) + 'G', 614, 650, screen, 30)
+        self.main.drawText('Reward: ' + str(self.main.minigameValue) + 'G', 614, 650, 30)
             
         if self.tweetyMinigameButton.draw(screen, inputs) == 1:
             self.status = 1
