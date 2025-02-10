@@ -16,9 +16,11 @@ class Main():
     #initialise Main class
     def __init__(self) -> None:
         self.game = Game()
+
         userID = 'guest'
-        
         self.saveLoadManager = SaveLoadManager((os.getcwd() + '/saveData/data.json'), self, userID)
+
+        
         #set game window
         self.WIDTH = 1440
         self.HEIGHT = 900
@@ -29,8 +31,8 @@ class Main():
         pygame.display.set_icon(icon)
 
         #loads global images
-        self.exitImage = pygame.image.load(os.getcwd() + '/assets/misc/exit.png')
-        self.exitHoverImage = pygame.image.load(os.getcwd() + '/assets/misc/exit hover.png')
+        self._exitImage = pygame.image.load(os.getcwd() + '/assets/misc/exit.png')
+        self._exitHoverImage = pygame.image.load(os.getcwd() + '/assets/misc/exit hover.png')
 
         #set variables
         self.inputs = {"escape": False, "click": False, "left": False, "right": False, "up": False, "backspace": False, "input": None}
@@ -165,6 +167,14 @@ class Main():
     def FPS(self) -> int:
         return self._FPS
     
+    @property
+    def exitImage(self) -> pygame.Surface:
+        return self._exitImage
+    
+    @property
+    def exitHoverImage(self) -> pygame.Surface:
+        return self._exitHoverImage
+
 
     @property
     def running(self) -> bool:

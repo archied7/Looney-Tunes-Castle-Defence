@@ -22,7 +22,7 @@ class RoadRunner(State):
         #set variables
         self.multiplier = 1
         self.scrollSpeed = 20
-        self.barrelFreq = 175
+        self.barrelFreq = 175 
         self.lastBarrel = pygame.time.get_ticks() - self.barrelFreq
         self.groundScroll = -900
         self.alive = True
@@ -31,7 +31,7 @@ class RoadRunner(State):
 
         #set the timer depending on the current round, maxed out at 45 seconds
         if self.main.game.round <= 36:
-            self.timer = 9 + self.main.game.round
+            self.timer = 14 + self.main.game.round
         else:
             self.timer = 45
 
@@ -80,7 +80,7 @@ class RoadRunner(State):
                     
 
                 #handles pausing ticks
-                if self.main.game.getPause() == True:
+                if self.main.game.paused == True:
                     self.startTicks = pygame.time.get_ticks() - self.currentTickDifference
                     self.main.game.changePause()
                     
@@ -88,7 +88,7 @@ class RoadRunner(State):
                 seconds = (pygame.time.get_ticks() - self.startTicks)/1000 * self.multiplier
                 if math.floor(seconds) >= 1:
                     self.startTicks = pygame.time.get_ticks()
-                    if self.timer > 0:
+                    if self.timer > 1:
                         self.timer -= 1
                     else:
                         self.alive = False
@@ -135,7 +135,8 @@ class RoadRunner(State):
                 
         #draws tutorial image
         if self.runner.isMoving == False:
-            screen.blit(self.tutorialImage, (self.main.WIDTH/2 - self.tutorialImage.get_width()/2, self.main.HEIGHT/2 - self.tutorialImage.get_height()/2))
+            screen.blit(self.tutorialImage, (self.main.WIDTH/2 - self.tutorialImage.get_width()/2,
+                                              self.main.HEIGHT/2 - self.tutorialImage.get_height()/2))
 
         #draws exit button when the minigame is complete
         if self.alive == False:

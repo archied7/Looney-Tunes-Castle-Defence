@@ -8,7 +8,6 @@ from classes.enemies.elmerFuddClass import ElmerFudd
 from classes.enemies.sylvesterClass import Sylvester
 from classes.enemies.marvinMartianClass import MarvinMartian
 from classes.spriteLoader import SpriteLoader
-from classes.linkedListClass import LinkedList
 from classes.archersClass import Archers
 
 import random
@@ -17,32 +16,37 @@ import pygame
 
 class Game:
     def __init__(self) -> None:
-        """"
+        """
         self.currentHeroes = {hero: position
                               hero: position
                               ...}
-        """""
+        """
+
+        #sets initial variables
         self.ownedTowers = []
         self.currentTower = None
         self.ownedHeroes = []
         self.currentHeroes = {1: None, 2: None, 3: None, 4: None}
         self.gold = 0
-        self.paused = False
+        self._paused = False
         self.pauseTick = 0
         self.round = 1
         self.roundComplete = False
 
+        #sets variables for generating enemies
         self.enemyAmount = 3
         self.enemyCounter = 0
         self.enemyFreq = 5000
         self.lastEnemy = pygame.time.get_ticks() - self.enemyFreq
 
+        #creates sprite groups
         self.projectileGroup = pygame.sprite.Group()
         self.enemyProjectileGroup = pygame.sprite.Group()
         self.enemyGroup = pygame.sprite.Group()
 
         self.loadSprites()
 
+        #creates objects
         self.castle = Castle()
         self.archers = Archers(self.projectileGroup, self.enemyGroup)
         self.bugsBunny = BugsBunny(self.bugsSprites, self.bugsBunnyMeta)
@@ -55,46 +59,46 @@ class Game:
         self.goldMultiplier = 1
         
 
-    def generateEnemies(self, dt, castle) -> None:
+    def generateEnemies(self, dt: float, castle: object) -> None:
         timeNow = pygame.time.get_ticks()
+        #checks if another enemy needs to be generated
         if timeNow - self.lastEnemy > self.enemyFreq and not self.roundComplete:
             if self.enemyCounter < self.enemyAmount:
+                #places it randomly in the 3 slots
                 pos = random.choice([600,500,400])
-                counter = 0
-                enemies = []
-                while counter is not self.enemyAmount:
-                    if self.round < 5:
-                        enemies.append(1)
-                    elif self.round < 10:
-                        enemies.append(random.choice([1,2]))
-                    elif self.round >= 10:
-                        enemies.append(random.choice([1,2,3]))
-                    
-                    counter += 1
 
+                #generates random enemy depending on the current round
+                if self.round < 5:
+                    enemy = 1
+                elif self.round < 10:
+                    enemy = random.choice([1,2])
+                elif self.round >= 10:
+                    enemy = random.choice([1,2,3])
 
+                #sets multiplier based on round
                 if self.round != 1:
                     multiplier = 1 + self.round*0.1
                 else:
                     multiplier = 1
 
-                if enemies[0] == 1:
+                #generates enemy object
+                if enemy == 1:
                     sylvester = Sylvester(self.sylvesterSprites, self.sylvesterMeta, pos, castle, multiplier)
                     self.enemyGroup.add(sylvester)
                     
-                elif enemies[0] == 2:
+                elif enemy == 2:
                     elmer = ElmerFudd(self.elmerSprites, self.elmerFuddMeta, pos, castle, multiplier, self.enemyProjectileGroup)
                     self.enemyGroup.add(elmer)
                 
-                elif enemies[0] == 3:
+                elif enemy == 3:
                     marvin = MarvinMartian(self.marvinSprites, self.marvinMartianMeta, pos, castle, multiplier, self.enemyProjectileGroup)
                     self.enemyGroup.add(marvin)
 
                 self.lastEnemy = pygame.time.get_ticks()
-                enemies.pop(0)
                 self.enemyCounter += 1
                     
             else:
+                #if all the enemies have been generated
                 self.roundComplete = True
                 self.enemyCounter = 0
                 if self.enemyFreq >= 500:
@@ -113,18 +117,14 @@ class Game:
         else:
             self.ownedHeroes.append(hero)
 
-    #modifies the currentHeroes list
     def changeHero(self, hero: object, change: str, position: int) -> None:
         if hero in self.ownedHeroes:
-            if change == "remove":
-                for key in self.currentHeroes:
-                    if self.currentHeroes[key] == hero:
-                        self.currentHeroes[key] = None
-                        break
-
-            elif change == "add":
+            #adds the hero to the current heroes
+            if change == "add":
                 self.currentHeroes[position] = hero
 
+            #adds the hero to the new position
+            #removes the hero from previous position
             elif change == "replace":
                 for key in self.currentHeroes:
                     if self.currentHeroes[key] == hero:
@@ -132,27 +132,29 @@ class Game:
                         break
                 self.currentHeroes[position] = hero
             
-        
-    def levelHero(self, hero: object):
+    def levelHero(self, hero: object) -> None:
+        #handles gold of levelling hero
         if hero.upgradePrice != 'MAX':
             if self.gold >= hero.upgradePrice:
                 self.gold -= hero.upgradePrice
                 hero.levelUp()
     
-    #adds a tower object to the ownedTowers list
     def purchaseTower(self, tower: object) -> None:
+        #adds a tower object to the ownedTower list
         if tower.cost <= self.gold:
             self.ownedTowers.append(tower)
             self.currentTower = tower
+            #applies bonus
             self.currentTower.bonus(self)
             self.gold -= tower.cost
 
-    #changes the tower stored in the currentTower attribute
     def changeTower(self, tower: object, change: str) -> None:
+        #changes the tower stored in the currentTower attribute
         if tower in self.ownedTowers:
             if change == "remove":
                 self.currentTower = None
             elif change == "replace":
+                #handles bonuses
                 self.currentTower.remove(self)
                 self.currentTower = tower
                 self.currentTower.bonus(self)
@@ -163,6 +165,7 @@ class Game:
         else:
             self.gold += value
 
+        #calculates minigame value
         reward = int(self.gold * 0.1)
         if reward <= 250:
             if reward >= 1:
@@ -176,13 +179,14 @@ class Game:
         return self.gold
 
     def changePause(self) -> None:
-        if self.paused:
-            self.paused = False
+        if self._paused:
+            self._paused = False
         else:
-            self.paused = True
+            self._paused = True
 
-    def getPause(self) -> None:
-        return self.paused
+    @property
+    def paused(self) -> bool:
+        return self._paused
     
     def getCurrentHeroes(self) -> list:
         return self.currentHeroes

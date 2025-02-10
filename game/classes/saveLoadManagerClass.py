@@ -2,22 +2,26 @@ import os
 import json
 
 class SaveLoadManager():
-    def __init__(self, file, main, userID):
+    def __init__(self, file: str, main: object, userID: str) -> None:
         self.userID = userID
         self.file = file
 
         self.main = main
 
+        #creates lists to iterate through
         self.heroes = [self.main.game.bugsBunny, self.main.game.daffyDuck, self.main.game.taz, self.main.game.yosemiteSam]
         self.towers = [self.main.game.healthTower, self.main.game.goldTower]
 
-    def save(self, data=None):
+    def save(self, data: dict=None) -> None:
         if data == None:
             dict = {}
+
+            #adds heroes not owned in at level 1
             for i in self.heroes:
                 if i not in self.main.game.ownedHeroes:
                     dict[i.name] = [1,0,0]
 
+            #adds owned heroes in
             for i in self.main.game.ownedHeroes:
                 level = i.level
                 pos = 0
@@ -27,6 +31,7 @@ class SaveLoadManager():
                         break
                 dict[i.name] = [level, pos, 1]
 
+            #adds towers in
             for i in self.towers:
                 if i == self.main.game.currentTower:
                     dict[i.name] = [1,1]
@@ -35,19 +40,24 @@ class SaveLoadManager():
                 else:
                     dict[i.name] = [0,0]
                 
+            #adds rest of save data in
             dict['castleLevel'] = self.main.game.castle.level
             dict['archerLevel'] = self.main.game.archers.level
             dict['gold'] = self.main.game.gold
             dict['roundNum'] = self.main.game.round
         
         else:
+            #sets dictionary as passed in data
             dict = data
 
+        #opens file in read mode
         with open(self.file, 'r') as file:
             currentData = json.load(file)
 
+        #modifies only the current user's data
         currentData[self.userID] = dict
 
+        #writes data to json file
         with open(self.file, 'w') as file:
             json.dump(currentData, file)
 

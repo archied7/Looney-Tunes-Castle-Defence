@@ -1,26 +1,26 @@
 from classes.states.stateClass import State
-from classes.spriteLoader import SpriteLoader
 from classes.states.minigameSelectState import MinigameSelect
 from classes.states.pauseState import Pause
 from classes.buttonClass import Button
-from classes.castleClass import Castle
-from classes.archersClass import Archers
-from classes.heroes.bugsBunnyClass import BugsBunny
 from classes.states.intermissionMenuState import IntermissionMenu, TowerIntermissionMenu
 from classes.states.daffyAbilityState import daffyAbility
 import pygame
 import os
 
 class MainGame(State):
-    def __init__(self, main) -> None:
+    def __init__(self, main: object) -> None:
         """
         currentState = 0 if intermission
                      = 1 if in round
         """
+        #initialises parent class
         State.__init__(self, main)
+
+        #sets initial variables
         self.currentState = 0
         self.minigameComplete = True
 
+        #creates buttons
         self.roundStartButton = Button(1125, 781, self.roundStartImage, 2, self.roundStartHoverImage)
         self.upgradeCastleButton = Button(900, 50, self.castleUpgradeImage, 2, self.castleUpgradeHoverImage)
         self.upgradeArcherButton = Button(1150, 50, self.archerUpgradeImage, 2, self.archerUpgradeHoverImage)
@@ -31,23 +31,31 @@ class MainGame(State):
         self.castleSlot3Button = Button(270, 403, self.emptySlotImage, 1, self.emptySlotHoverImage)
         self.castleSlot4Button = Button(355, 354, self.emptySlotImage, 1, self.emptySlotHoverImage)
 
+        #creates list of castle slot buttons for iteration
         self.castleSlotButtons = [self.castleSlot1Button, self.castleSlot2Button, self.castleSlot3Button, self.castleSlot4Button]
 
+        #buys starting hero and places it
         self.main.game.purchaseHero(self.main.game.bugsBunny, 2, 1)
         self.main.game.currentHeroes[1] = self.main.game.bugsBunny
 
-    def update(self, dt, inputs) -> None:
+    def update(self, dt: float, inputs: dict) -> None:
         pygame.display.update()
+        
+        #for intermission
         if self.currentState == 0:
-
             #handles minigame
             if self.minigameComplete == False:
+                #saves the game before the minigame
                 self.main.saveLoadManager.save()
+
+                #sets next state to select minigame
                 nextState = MinigameSelect(self.main)
                 nextState.newState()
+
                 self.minigameComplete = True
 
             else:
+                #updates button images
                 for i in self.main.game.currentHeroes:
                     if self.main.game.currentHeroes[i] is not None:
                         self.castleSlotButtons[i-1].changeImage(self.main.game.currentHeroes[i].intermissionImage, 1)
@@ -59,17 +67,20 @@ class MainGame(State):
                 else:
                     self.towerSlotButton.changeImage(self.emptySlotImage, 1.5, self.emptySlotHoverImage)
 
+        #for in round
         else:
+            #generates enemies for round
             self.main.game.generateEnemies(dt, self.main.game.castle)
+
+            #updates all objects currently in use
             self.main.game.enemyGroup.update(dt, self.main.FPS)
             self.main.game.archers.update(dt, self.main.FPS)
     
             for projectile in self.main.game.projectileGroup:
-                if projectile.rect.x > 1300:
-                    projectile.kill()
                 projectile.update(dt, self.main.FPS)
 
             for projectile in self.main.game.enemyProjectileGroup:
+                #handles when projectile hits castle
                 if projectile.rect.x < 700:
                     projectile.kill()
                     self.main.game.castle.takeDamage(projectile.damage)
@@ -80,10 +91,12 @@ class MainGame(State):
                     self.main.game.currentHeroes[i].update(dt, self.main.FPS, inputs)
 
             if self.main.game.daffyDuck.abilityInUse:
+                #handles daffy duck ability
                 ability = daffyAbility(self.main, 999, self.main.game.daffyDuck.arrowImage)
                 ability.newState()
                 self.main.game.daffyDuck.abilityInUse = False
 
+            #handles collisions between bugs goons and enemies
             collided = pygame.sprite.groupcollide(self.main.game.enemyGroup, self.main.game.bugsBunny.goonGroup, False, False)
             
             for collisions in collided:
@@ -93,6 +106,7 @@ class MainGame(State):
                     if not collisions.alive:
                         self.main.game.gold += int(collisions.stats['value'] * self.main.game.goldMultiplier)
 
+            #handles collisions between projectiles and enemies
             collided = pygame.sprite.groupcollide(self.main.game.enemyGroup, self.main.game.projectileGroup, False, True)
 
             for collisions in collided:
@@ -102,6 +116,7 @@ class MainGame(State):
                         self.main.game.gold += int(collisions.stats['value'] * self.main.game.goldMultiplier)
 
 
+            #handles end of round
             if (not self.main.game.castle.alive) or (not self.main.game.enemyGroup and self.main.game.roundComplete):
                 for i in self.main.game.currentHeroes:
                     if self.main.game.currentHeroes[i] is not None:
@@ -141,7 +156,8 @@ class MainGame(State):
 
             
 
-    def render(self, screen, inputs) -> None:
+    def render(self, screen: pygame.Surface, inputs: dict) -> None:
+        #draws things permanetly shown on screen
         screen.fill((255,255,255))
         screen.blit(self.backgroundImage, (0,0))
         screen.blit(self.castleImage, (250, 320))
@@ -150,8 +166,7 @@ class MainGame(State):
         self.main.drawText('HEALTH: ' + str(int(self.main.game.castle.currentHealth)), 10, 40, 30, 'red')
         self.main.drawText('ROUND: ' + str(self.main.game.round), 10, 70, 30, 'black')
 
-
-
+        #during intermission state
         if self.currentState == 0:
             if self.minigameComplete:
                 #round start button
@@ -173,13 +188,15 @@ class MainGame(State):
                 #upgrade buttons
                 if self.upgradeCastleButton.draw(screen, inputs):   
                     if self.main.game.getGold() >= self.main.game.castle.upgradePrice:
-                        self.main.game.changeGold(self.main.game.castle.upgradePrice, True)
-                        self.main.game.castle.upgrade()
+                        if self.main.game.castle.level < 75:
+                            self.main.game.changeGold(self.main.game.castle.upgradePrice, True)
+                            self.main.game.castle.upgrade()
 
                 if self.upgradeArcherButton.draw(screen, inputs):
                     if self.main.game.getGold() >= self.main.game.archers.getUpgradePrice():
-                        self.main.game.changeGold(self.main.game.archers.getUpgradePrice(), True)
-                        self.main.game.archers.levelUp()
+                        if self.main.game.archers.level < 75:
+                            self.main.game.changeGold(self.main.game.archers.getUpgradePrice(), True)
+                            self.main.game.archers.levelUp()
 
                 self.main.drawText('COST: ' + str(self.main.game.castle.upgradePrice), 1000, 110, 15)
                 self.main.drawText('LEVEL: ' + str(self.main.game.castle.level), 997, 130, 15, 'black')
@@ -189,6 +206,7 @@ class MainGame(State):
                 self.main.game.archers.render(screen)
 
         else:
+            #draws objects currently in use
             for sprite in self.main.game.enemyGroup: 
                 sprite.draw(screen)
 

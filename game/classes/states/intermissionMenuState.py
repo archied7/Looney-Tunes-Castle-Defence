@@ -5,8 +5,10 @@ import os
 import pygame
 
 class IntermissionMenu(State):
-    def __init__(self, main, castleSlot) -> None:
+    def __init__(self, main: object, castleSlot: int) -> None:
+        #intialise parent class
         State.__init__(self, main)
+
         self.castleSlot = castleSlot
 
         if self.castleSlot == 1:
@@ -28,6 +30,7 @@ class IntermissionMenu(State):
         
         self.loadImages()
 
+        #create semi transparent surface
         self.surface = pygame.Surface((1440,900), pygame.SRCALPHA)
         self.surface.fill((0,0,0,100))
 
@@ -36,14 +39,17 @@ class IntermissionMenu(State):
         self.owned = [0,0,0,0]
         self.current = []
 
+        #create current heroes list
         for i in self.main.game.currentHeroes:
             self.current.append(self.main.game.currentHeroes[i])
 
+        #create buttons
         self.bugsButton = Button(self.x, self.y+16, self.bugsImage, 1.5, self.bugsHover)
         self.daffyButton = Button(self.x, self.y+75, self.daffyImage, 1.5, self.daffyHover)
         self.tazButton = Button(self.x, self.y+133, self.tazImage, 1.5, self.tazHover)
         self.yosemiteSamButton = Button(self.x, self.y+193, self.yosemiteSamImage, 1.5, self.yosemiteSamHover)
 
+        #set owned heroes list
         if self.main.game.bugsBunny in self.main.game.ownedHeroes:
             self.owned[0] = 1
         if self.main.game.daffyDuck in self.main.game.ownedHeroes:
@@ -53,7 +59,7 @@ class IntermissionMenu(State):
         if self.main.game.yosemiteSam in self.main.game.ownedHeroes:
             self.owned[3] = 1
 
-    def update(self, dt, inputs) -> None:
+    def update(self, dt: float, inputs: dict) -> None:
         pygame.display.update()
 
         #handles leaving state

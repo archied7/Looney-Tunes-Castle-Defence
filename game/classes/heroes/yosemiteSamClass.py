@@ -3,7 +3,7 @@ from classes.projectileClass import Bullet
 import pygame
 
 class YosemiteSam(Hero):
-    def __init__(self, spriteList, spriteMeta, projectileGroup, enemyGroup):
+    def __init__(self, spriteList: list, spriteMeta: list, projectileGroup: pygame.sprite.Group, enemyGroup: pygame.sprite.Group) -> None:
         stats = {"maxCooldown": 20, "currentCooldown": 20, "damage": 1, "attackSpeed": 1, "abilityValue": 3}
         Hero.__init__(self, stats, spriteList, spriteMeta)
         self.intermissionImage = self.sprites[0]
@@ -16,8 +16,9 @@ class YosemiteSam(Hero):
 
         self.name = 'yosemiteSam'
 
-    def update(self, dt, fps, inputs):
+    def update(self, dt: float, fps: int, inputs: dict) -> None:
         if self.abilityInUse:
+            #handles shooting and animation during ability
             self.animate(4, 7, dt, 1/30)
             self.lastUpdateAbility += dt
             if self.lastUpdateAbility > self.stats["abilityValue"]:
@@ -30,6 +31,7 @@ class YosemiteSam(Hero):
                 self.shot = False
 
         else:
+            #handles shooting and animation regularly
             self.animate(0, 3, dt, 1/(self.stats["attackSpeed"]*3))
             if self.animationFrame == 3 and not self.shot:
                 self.shoot()
@@ -40,18 +42,18 @@ class YosemiteSam(Hero):
         if self.stats['currentCooldown'] < self.stats['maxCooldown']:
             self.stats['currentCooldown'] += 0.1
 
-    def render(self, screen, x, y):
+    def render(self, screen: pygame.Surface, x: int, y: int) -> None:
         self.x = x
         self.y = y
         screen.blit(self.image, (x+self.xOffset, y+self.yOffset+27))
         self.drawBar(screen, 1, self.stats['maxCooldown'], self.stats['currentCooldown'], x, y)
 
-    def useAbility(self):
+    def useAbility(self) -> None:
         if self.stats['currentCooldown'] >= self.stats['maxCooldown']:
             self.stats['currentCooldown'] = 0
             self.abilityInUse = True
 
-    def shoot(self):
+    def shoot(self) -> None:
         if self.enemyGroup:
             target = self.enemyGroup.sprites()[0]
             bullet = Bullet(self.bulletSprites, self.x+40, self.y+50, self.stats['damage'], False, target.rect.topleft[0], target.rect.center[1], True)

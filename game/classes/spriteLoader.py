@@ -26,10 +26,7 @@ class SpriteLoader():
         sprite.blit(spriteSheet,(0,0), (x, y, width,  height))
         sprite = pygame.transform.scale(sprite, (width*self.scale, height*self.scale))
         return sprite
-    
-    def getSprites(self):
-        return self.sprites
-    
+
     def getSpritesList(self):
         #returns the sprites in a list
         sprites = []

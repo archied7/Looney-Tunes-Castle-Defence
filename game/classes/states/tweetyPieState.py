@@ -7,8 +7,11 @@ import os
 import random
 
 class TweetyPie(State):
-    def __init__(self, main) -> None:
+    def __init__(self, main: object) -> None:
+        #initialise parent class
         State.__init__(self, main)
+
+        #create exit button
         self.exitButton = Button(538, 660, self.main.exitImage, 2.5, self.main.exitHoverImage)
 
         #set game variables
@@ -24,6 +27,7 @@ class TweetyPie(State):
         self.goldAdded = False
         self.currentTickDifference = 0
 
+        #calculate the amount of pipes in the game
         if self.main.game.round <= 20:
             if self.main.game.round == 1:
                 self.pipeTotal = 1
@@ -32,21 +36,25 @@ class TweetyPie(State):
         else:
             self.pipeTotal = 20
 
+        #create objects and sprite group
         self.tweety = Tweety(200, ((self.main.HEIGHT / 2) - 100 ))
         self.pipeGroup = pygame.sprite.Group()
 
-    def update(self, dt, inputs) -> None:
+    def update(self, dt: float, inputs: dict) -> None:
         pygame.display.update()
 
+        #check if the game has been completed
         if self.score >= self.pipeTotal:
             self.alive = False
             self.result = True
 
+        #check if tweety pie has died and update
         if self.tweety.update(dt, inputs, self.main.FPS) == 1:
             self.alive = False
 
-        if self.alive and self.main.game.getPause() == False:
-            if self.tweety.getFlying():
+        if self.alive and self.main.game.paused == False:
+            #during minigame being played
+            if self.tweety.flying:
                 timeNow = pygame.time.get_ticks()
                 self.pipeGroup.update(dt, self.main.FPS, self.scrollSpeed)
 
@@ -84,7 +92,7 @@ class TweetyPie(State):
                     self.groundScroll = 0
 
         #handles ticks when game ispaused
-        elif self.main.game.getPause():
+        elif self.main.game.paused:
                 self.lastPipe = pygame.time.get_ticks() - self.currentTickDifference
                 self.main.game.changePause()
 
@@ -96,7 +104,7 @@ class TweetyPie(State):
                     self.goldAdded = True
 
 
-    def render(self, screen, inputs) -> None:
+    def render(self, screen: pygame.Surface, inputs: dict) -> None:
         screen.fill((0,0,0))
         screen.blit(self.backgroundImage, (0,0))
 
@@ -106,8 +114,9 @@ class TweetyPie(State):
         screen.blit(self.groundImage, (self.groundScroll,800))
         self.main.drawText(str(self.score), 10, 10, 60)
 
-        if self.tweety.getFlying() == False and self.alive:
-            screen.blit(self.tutorialImage, (self.main.WIDTH/2 - self.tutorialImage.get_width()/2, self.main.HEIGHT/2 - self.tutorialImage.get_height()/2))
+        if self.tweety.flying == False and self.alive:
+            screen.blit(self.tutorialImage, (self.main.WIDTH/2 - self.tutorialImage.get_width()/2, self.main.HEIGHT/2
+                                              - self.tutorialImage.get_height()/2))
 
         #handles pausing
         if inputs['escape'] == True:
@@ -129,46 +138,55 @@ class TweetyPie(State):
         self.tutorialImage = pygame.transform.scale_by(self.tutorialImage, 2.5)
 
 class Tweety():
-    def __init__(self, x, y):
+    def __init__(self, x: int, y: int) -> None:
         self.loadSprites()
         self.currentFrameNum = 1
 
+        #create current rect
         self.rect = self.tweetyFrames[self.currentFrameNum%2].get_rect()
         self.rect.center = ((x,y))
 
         self.lastUpdate = 0
         self.velocity = 0
-        self.flying = False
+        self._flying = False
 
+        #set current image
         self.currentFrame = self.tweetyFrames[0]
 
-    def update(self, dt, inputs, fps):
-        if self.flying:
+    def update(self, dt: float, inputs: dict, fps: int) -> int:
+        if self._flying:
             self.animate(dt)
+
+            #increase the speed of the bird
             self.velocity += 2 * dt * fps
             if self.velocity > 20 * dt * fps:
                 self.velocity = 20 * dt * fps
 
         if self.rect.y < 720:
+            #move the bird up and down
             self.rect.y += self.velocity
         else:
-            self.flying = False
+            #if the bird hit the ground
+            self._flying = False
             return 1
 
         if self.rect.y < -250:
-            self.flying = False
+            #if the bird if too far above the screen
+            self._flying = False
             return 1
 
         if inputs['click'] == True:
-            if self.flying == False:
-                self.flying = True
+            #starts the game
+            if self._flying == False:
+                self._flying = True
 
+            #moves the bird up
             self.velocity = -20 * dt * fps
             
-    def render(self, screen):
+    def render(self, screen: pygame.Surface) -> None:
         screen.blit(self.currentFrame, (self.rect.x, self.rect.y))
 
-    def animate(self, dt):
+    def animate(self, dt: float) -> None:
         self.lastUpdate += dt
 
         if self.lastUpdate > 0.15:
@@ -176,26 +194,36 @@ class Tweety():
             self.currentFrameNum += 1
             self.currentFrame = self.tweetyFrames[(self.currentFrameNum % 2)]
 
-    def loadSprites(self):
+    def loadSprites(self) -> None:
+        #loads sprites
         tweetyPieSpriteSheet = pygame.image.load(os.getcwd() + '/assets/characters/tweety pie.png')
         tweetyPieSpritesObject = SpriteLoader((os.getcwd() + '/assets/characters/tweety pie meta.json'), tweetyPieSpriteSheet, True)
         self.tweetyFrames = tweetyPieSpritesObject.getSpritesList()
 
-    def getFlying(self):
-        return self.flying
+    @property
+    def flying(self) -> bool:
+        return self._flying
+    
+    @flying.setter
+    def flying(self, val: bool) -> None:
+        self._flying = val
 
 class Pipe(pygame.sprite.Sprite):
-    def __init__(self, x, y, orientation, image):
+    def __init__(self, x: int, y: int, orientation: int, image: pygame.Surface) -> None:
         """
         orientation = 0 is from top
         orientation = 1 is from bottom
         """
 
         pygame.sprite.Sprite.__init__(self)
+
+        #sets current rect
         self.image = image
         self.rect = self.image.get_rect()
+
         self.gapLength = 250
 
+        #places the pipe's initial position
         if orientation == 0:
             self.image = pygame.transform.flip(self.image, False, True)
             self.rect.bottomleft = ((x,y - self.gapLength / 2))
@@ -203,7 +231,8 @@ class Pipe(pygame.sprite.Sprite):
         if orientation == 1:
             self.rect.topleft = ((x,y + self.gapLength / 2))
 
-    def update(self, dt, fps, scrollSpeed):
+    def update(self, dt: float, fps: int, scrollSpeed:int) -> None:
+        #moves the pipe to the left
         self.rect.x -= scrollSpeed * dt * fps
         if self.rect.right < 0:
             self.kill()

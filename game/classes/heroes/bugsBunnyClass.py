@@ -3,20 +3,23 @@ from classes.entityClass import Entity
 import pygame
 
 class BugsBunny(Hero):
-    def __init__(self, spriteList, spriteMeta) -> None:
+    def __init__(self, spriteList: list, spriteMeta: list) -> None:
+        #creates stats dict
         stats = {"maxCooldown" : 3, "currentCooldown" : 3, "damage": 1, "attackSpeed" : 1, "abilityValue": 1}
         
-        self.goonSpriteMeta = spriteMeta
+        #initialises parent class
         Hero.__init__(self, stats, spriteList, spriteMeta)
         self.intermissionImage = self.sprites[0]
 
+        self.goonSpriteMeta = spriteMeta
         self.goonGroup = pygame.sprite.Group()
 
         self.name = 'bugsBunny'
 
 
-    def update(self, dt, fps, inputs):
+    def update(self, dt: float, fps: int, inputs: dict) -> None:
         if self.abilityInUse:
+            #animation for ability
             if self.animationFrame != 2:
                 self.animate(1,2, dt)
             else:
@@ -25,13 +28,14 @@ class BugsBunny(Hero):
         else:
             self.image = self.sprites[self.animationFrame]
 
+        #updates the cooldown
         if self.stats['currentCooldown'] < self.stats['maxCooldown']:
             self.stats['currentCooldown'] += 0.1
         
-
+        #updates goons
         self.goonGroup.update(dt, fps)
 
-    def render(self, screen, x, y):
+    def render(self, screen: pygame.Surface, x: int, y: int):
         screen.blit(self.image, (x, y))
         self.drawBar(screen, 1, self.stats['maxCooldown'], self.stats['currentCooldown'], x, y)
 
@@ -56,11 +60,15 @@ class BugsBunny(Hero):
 
 
 class BugsBunnyGoon(pygame.sprite.Sprite, Entity):
-    def __init__(self, damage, sprites, row, spritesMeta, abilityValue):
+    def __init__(self, damage: float, sprites: list, row: int, spritesMeta: dict, abilityValue: float):
+        #initialise Sprite class
         pygame.sprite.Sprite.__init__(self)
 
         stats = {"damage": damage, "runSpeed": 15}
+
+        #initialise Entity class
         Entity.__init__(self, stats, sprites, spritesMeta)
+
         self.animationFrame = 3
         self.image = self.sprites[self.animationFrame]
 
@@ -78,13 +86,13 @@ class BugsBunnyGoon(pygame.sprite.Sprite, Entity):
             self.rect.bottomleft = (self.x, 500)
 
 
-    def update(self, dt, fps):
+    def update(self, dt: float, fps: int):
         self.animate(3,5, dt, 0.1)
         self.rect.x += self.stats["runSpeed"] * dt * fps + self.xOffset
         if self.rect.left > 1440:
             self.kill()
 
-    def takeDamage(self, val):
+    def takeDamage(self, val: float):
         if self.stats['damage'] >= val:
             self.currentDamage = self.stats['damage']
             self.stats['damage'] -= val
